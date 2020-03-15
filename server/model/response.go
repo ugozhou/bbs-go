@@ -5,21 +5,17 @@ import (
 )
 
 type UserInfo struct {
-	Id           int64    `json:"id"`
-	Username     string   `json:"username"`
-	Email        string   `json:"email"`
-	Nickname     string   `json:"nickname"`
-	Avatar       string   `json:"avatar"`
-	Type         int      `json:"type"`
-	Roles        []string `json:"roles"`
-	HomePage     string   `json:"homePage"`
-	Description  string   `json:"description"`
-	Score        int      `json:"score"`        // 积分
-	TopicCount   int      `json:"topicCount"`   // 话题数量
-	CommentCount int      `json:"commentCount"` // 跟帖数量
-	PasswordSet  bool     `json:"passwordSet"`  // 密码已设置
-	Status       int      `json:"status"`
-	CreateTime   int64    `json:"createTime"`
+	Id          int64    `json:"id"`
+	Email       string   `json:"email"`
+	Nickname    string   `json:"nickname"`
+	Avatar      string   `json:"avatar"`
+	Type        int      `json:"type"`
+	Roles       []string `json:"roles"`
+	Phone       string   `json:"phone"`
+	Score       int      `json:"score"`       // 积分
+	PasswordSet bool     `json:"passwordSet"` // 密码已设置
+	Status      int      `json:"status"`
+	CreateTime  int64    `json:"createTime"`
 }
 
 func (info *UserInfo) HasRole(role string) bool {
@@ -86,24 +82,9 @@ type TopicResponse struct {
 	Toc     template.HTML `json:"toc"`
 }
 
-// 项目简单返回
-type ProjectSimpleResponse struct {
-	ProjectId   int64     `json:"projectId"`
-	User        *UserInfo `json:"user"`
-	Name        string    `json:"name"`
-	Title       string    `json:"title"`
-	Logo        string    `json:"logo"`
-	Url         string    `json:"url"`
-	DocUrl      string    `json:"docUrl"`
-	DownloadUrl string    `json:"downloadUrl"`
-	Summary     string    `json:"summary"`
-	CreateTime  int64     `json:"createTime"`
-}
-
 // 项目详情
 type ProjectResponse struct {
-	ProjectSimpleResponse
-	Content template.HTML `json:"content"`
+	Project
 }
 
 type CommentResponse struct {

@@ -1,52 +1,50 @@
 package admin
 
 import (
-	"strconv"
-
-	"github.com/kataras/iris/v12"
-	"github.com/mlogclub/simple"
-
 	"bbs-go/model"
 	"bbs-go/services"
+	"github.com/kataras/iris/v12"
+	"github.com/mlogclub/simple"
+	"strconv"
 )
 
-type TopicNodeController struct {
+type WaiterController struct {
 	Ctx iris.Context
 }
 
-func (c *TopicNodeController) GetBy(id int64) *simple.JsonResult {
-	t := services.TopicNodeService.Get(id)
+func (c *WaiterController) GetBy(id int64) *simple.JsonResult {
+	t := services.WaiterService.Get(id)
 	if t == nil {
 		return simple.JsonErrorMsg("Not found, id=" + strconv.FormatInt(id, 10))
 	}
 	return simple.JsonData(t)
 }
 
-func (c *TopicNodeController) AnyList() *simple.JsonResult {
-	list, paging := services.TopicNodeService.FindPageByParams(simple.NewQueryParams(c.Ctx).EqByReq("name").PageByReq().Asc("sort_no").Desc("id"))
+func (c *WaiterController) AnyList() *simple.JsonResult {
+	list, paging := services.WaiterService.FindPageByParams(simple.NewQueryParams(c.Ctx).PageByReq().Desc("id"))
 	return simple.JsonData(&simple.PageResult{Results: list, Page: paging})
 }
 
-func (c *TopicNodeController) PostCreate() *simple.JsonResult {
-	t := &model.TopicNode{}
+func (c *WaiterController) PostCreate() *simple.JsonResult {
+	t := &model.Waiter{}
 	err := simple.ReadForm(c.Ctx, t)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
-	t.CreateTime = simple.NowTimestamp()
-	err = services.TopicNodeService.Create(t)
+
+	err = services.WaiterService.Create(t)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
 	return simple.JsonData(t)
 }
 
-func (c *TopicNodeController) PostUpdate() *simple.JsonResult {
+func (c *WaiterController) PostUpdate() *simple.JsonResult {
 	id, err := simple.FormValueInt64(c.Ctx, "id")
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
-	t := services.TopicNodeService.Get(id)
+	t := services.WaiterService.Get(id)
 	if t == nil {
 		return simple.JsonErrorMsg("entity not found")
 	}
@@ -56,7 +54,7 @@ func (c *TopicNodeController) PostUpdate() *simple.JsonResult {
 		return simple.JsonErrorMsg(err.Error())
 	}
 
-	err = services.TopicNodeService.Update(t)
+	err = services.WaiterService.Update(t)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}

@@ -14,10 +14,10 @@ type ProjectController struct {
 	Ctx iris.Context
 }
 
-func (c *ProjectController) GetBy(id int64) *simple.JsonResult {
+func (c *ProjectController) GetBy(id int) *simple.JsonResult {
 	t := services.ProjectService.Get(id)
 	if t == nil {
-		return simple.JsonErrorMsg("Not found, id=" + strconv.FormatInt(id, 10))
+		return simple.JsonErrorMsg("Not found, id=" + strconv.FormatInt(int64(id), 10))
 	}
 	return simple.JsonData(t)
 }
@@ -42,7 +42,7 @@ func (c *ProjectController) PostCreate() *simple.JsonResult {
 }
 
 func (c *ProjectController) PostUpdate() *simple.JsonResult {
-	id, err := simple.FormValueInt64(c.Ctx, "id")
+	id, err := simple.FormValueInt(c.Ctx, "id")
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}

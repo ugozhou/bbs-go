@@ -2,8 +2,10 @@ package common
 
 import (
 	"errors"
+	"math/rand"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/mlogclub/simple"
 
@@ -149,4 +151,23 @@ func ApplyImageStyle(imageUrl, styleName string) string {
 		imageUrl = imageUrl[:splitterIndex]
 	}
 	return imageUrl + "!" + styleName
+}
+func GetRandomString(l int) string {
+	str := "0123456789abcdefghijklmnopqrstuvwxyz"
+	bytes := []byte(str)
+	result := []byte{}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[r.Intn(len(bytes))])
+	}
+
+	return string(result)
+}
+
+// 验证电话号码
+func IsValidateMobile(mobileNum string) bool {
+	regular := "^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$"
+
+	reg := regexp.MustCompile(regular)
+	return reg.MatchString(mobileNum)
 }

@@ -1,6 +1,5 @@
 ---
 home: true
-# heroImage: https://file.mlog.club/mlog.club/logo_364x200.png
 actionText: 快速上手 →
 actionLink: /guide/
 features:
@@ -13,17 +12,8 @@ features:
 footer: Copyright © 2019
 ---
 
-## 官方演示交流站
-
-[https://mlog.club](https://mlog.club)
-
-## 公众号
-
-> 欢迎关注公众号`码农俱乐部`获取更多干货资源。
-
-![码农俱乐部](https://open.weixin.qq.com/qr/code?username=gh_950827012b8d)
 
 ## 源码
 
-- Github：[https://github.com/mlogclub/bbs-go](https://github.com/mlogclub/bbs-go)
-- 码云：[https://gitee.com/mlogclub/bbs-go](https://gitee.com/mlogclub/bbs-go)
+- Github：[https://github.com/mlogclub/bbs-go](https://github.com/ugozhou/bbs-go)
+- 码云：[https://gitee.com/mlogclub/bbs-go](https://gitee.com/ugozhou/bbs-go)

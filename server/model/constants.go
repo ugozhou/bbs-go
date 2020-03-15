@@ -17,3 +17,23 @@ const (
 	ImageStyleAvatar = "avatar" // 头像样式
 	ImageStyleDetail = "detail" // 图片详情样式
 )
+
+//USDT资源变更类型
+const (
+	Recharge = iota + 1 //充值
+	BuyMiner            //购买矿机
+)
+
+const (
+	SelfBuy        = iota + 1 //自购
+	InviatorReward            //邀请奖励
+)
+
+const (
+	Level0   = "s0"
+	Level1   = "s1"
+	LevelV1  = "v1"
+	Levelv2  = "v2"
+	Levelv3  = "v3"
+	LevelVip = "vip"
+)

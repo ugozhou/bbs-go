@@ -63,6 +63,7 @@ type Config struct {
 	} `yaml:"Smtp"`
 }
 
+//读取配置yaml文件
 func InitConfig(filename string) {
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {

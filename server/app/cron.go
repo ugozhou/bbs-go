@@ -13,13 +13,13 @@ func startSchedule() {
 	// Generate RSS
 	addCronFunc(c, "@every 30m", func() {
 		services.ArticleService.GenerateRss()
-		services.TopicService.GenerateRss()
-		services.ProjectService.GenerateRss()
+		//services.TopicService.GenerateRss()
+		//services.ProjectService.GenerateRss()
 	})
 
 	// Generate sitemap
 	addCronFunc(c, "@every 30m", func() {
-		services.SitemapService.GenerateToday()
+		//services.SitemapService.GenerateToday()
 	})
 
 	c.Start()

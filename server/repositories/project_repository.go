@@ -16,7 +16,7 @@ func newProjectRepository() *projectRepository {
 type projectRepository struct {
 }
 
-func (r *projectRepository) Get(db *gorm.DB, id int64) *model.Project {
+func (r *projectRepository) Get(db *gorm.DB, id int) *model.Project {
 	ret := &model.Project{}
 	if err := db.First(ret, "id = ?", id).Error; err != nil {
 		return nil
@@ -71,16 +71,16 @@ func (r *projectRepository) Update(db *gorm.DB, t *model.Project) (err error) {
 	return
 }
 
-func (r *projectRepository) Updates(db *gorm.DB, id int64, columns map[string]interface{}) (err error) {
+func (r *projectRepository) Updates(db *gorm.DB, id int, columns map[string]interface{}) (err error) {
 	err = db.Model(&model.Project{}).Where("id = ?", id).Updates(columns).Error
 	return
 }
 
-func (r *projectRepository) UpdateColumn(db *gorm.DB, id int64, name string, value interface{}) (err error) {
+func (r *projectRepository) UpdateColumn(db *gorm.DB, id int, name string, value interface{}) (err error) {
 	err = db.Model(&model.Project{}).Where("id = ?", id).UpdateColumn(name, value).Error
 	return
 }
 
-func (r *projectRepository) Delete(db *gorm.DB, id int64) {
+func (r *projectRepository) Delete(db *gorm.DB, id int) {
 	db.Model(&model.Project{}).Delete("id", id)
 }

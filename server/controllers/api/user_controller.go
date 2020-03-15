@@ -1,7 +1,6 @@
 package api
 
 import (
-	"strconv"
 	"strings"
 
 	"github.com/kataras/iris/v12"
@@ -96,43 +95,47 @@ func (c *UserController) PostUpdateAvatar() *simple.JsonResult {
 	return simple.JsonSuccess()
 }
 
-// 设置用户名
-func (c *UserController) PostSetUsername() *simple.JsonResult {
+// 设置用户昵称
+func (c *UserController) PostSetNickname() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
 	}
-	username := strings.TrimSpace(simple.FormValue(c.Ctx, "username"))
-	err := services.UserService.SetUsername(user.Id, username)
+	nickname := strings.TrimSpace(simple.FormValue(c.Ctx, "nickname"))
+	err := services.UserService.SetNickname(user.Id, nickname)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
 	return simple.JsonSuccess()
 }
 
-// 设置邮箱
-func (c *UserController) PostSetEmail() *simple.JsonResult {
-	user := services.UserTokenService.GetCurrent(c.Ctx)
-	if user == nil {
-		return simple.JsonError(simple.ErrorNotLogin)
-	}
-	email := strings.TrimSpace(simple.FormValue(c.Ctx, "email"))
-	err := services.UserService.SetEmail(user.Id, email)
-	if err != nil {
-		return simple.JsonErrorMsg(err.Error())
-	}
-	return simple.JsonSuccess()
-}
+//// 设置邮箱
+//func (c *UserController) PostSetEmail() *simple.JsonResult {
+//	user := services.UserTokenService.GetCurrent(c.Ctx)
+//	if user == nil {
+//		return simple.JsonError(simple.ErrorNotLogin)
+//	}
+//	email := strings.TrimSpace(simple.FormValue(c.Ctx, "email"))
+//	err := services.UserService.SetEmail(user.Id, email)
+//	if err != nil {
+//		return simple.JsonErrorMsg(err.Error())
+//	}
+//	return simple.JsonSuccess()
+//}
 
-// 设置密码
-func (c *UserController) PostSetPassword() *simple.JsonResult {
+// 设置支付密码
+func (c *UserController) PostSetPayPassword() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
 	}
+	loginPassword := simple.FormValue(c.Ctx, "loginPassword")
 	password := simple.FormValue(c.Ctx, "password")
 	rePassword := simple.FormValue(c.Ctx, "rePassword")
-	err := services.UserService.SetPassword(user.Id, password, rePassword)
+	if !simple.ValidatePassword(user.Password, loginPassword) {
+		return simple.JsonErrorMsg("登陆密码错误")
+	}
+	err := services.UserService.SetPayPassword(user.Id, password, rePassword)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
@@ -157,63 +160,82 @@ func (c *UserController) PostUpdatePassword() *simple.JsonResult {
 	return simple.JsonSuccess()
 }
 
-// 用户收藏
-func (c *UserController) GetFavorites() *simple.JsonResult {
-	user := services.UserTokenService.GetCurrent(c.Ctx)
-	cursor := simple.FormValueInt64Default(c.Ctx, "cursor", 0)
-
-	// 用户必须登录
-	if user == nil {
-		return simple.JsonError(simple.ErrorNotLogin)
+func (c *UserController) PostForgetPassword() *simple.JsonResult {
+	var (
+		mobile = c.Ctx.PostValueTrim("phone")
+		//captchaCode    = c.Ctx.PostValueTrim("captchaCode")
+		password   = c.Ctx.PostValueTrim("password")
+		rePassword = c.Ctx.PostValueTrim("rePassword")
+	)
+	if !common.IsValidateMobile(mobile) {
+		return simple.JsonError(common.MobileError)
 	}
 
-	// 查询列表
-	var favorites []model.Favorite
-	if cursor > 0 {
-		favorites = services.FavoriteService.Find(simple.NewSqlCnd().Where("user_id = ? and id < ?",
-			user.Id, cursor).Desc("id").Limit(20))
-	} else {
-		favorites = services.FavoriteService.Find(simple.NewSqlCnd().Where("user_id = ?", user.Id).Desc("id").Limit(20))
+	err := services.UserService.SetPassword(mobile, password, rePassword)
+	if err != nil {
+		return simple.JsonErrorMsg(err.Error())
 	}
+	return simple.JsonSuccess()
 
-	if len(favorites) > 0 {
-		cursor = favorites[len(favorites)-1].Id
-	}
-
-	return simple.JsonCursorData(render.BuildFavorites(favorites), strconv.FormatInt(cursor, 10))
 }
+
+//// 用户收藏
+//func (c *UserController) GetFavorites() *simple.JsonResult {
+//	user := services.UserTokenService.GetCurrent(c.Ctx)
+//	cursor := simple.FormValueInt64Default(c.Ctx, "cursor", 0)
+//
+//	// 用户必须登录
+//	if user == nil {
+//		return simple.JsonError(simple.ErrorNotLogin)
+//	}
+//
+//	// 查询列表
+//	var favorites []model.Favorite
+//	if cursor > 0 {
+//		favorites = services.FavoriteService.Find(simple.NewSqlCnd().Where("user_id = ? and id < ?",
+//			user.Id, cursor).Desc("id").Limit(20))
+//	} else {
+//		favorites = services.FavoriteService.Find(simple.NewSqlCnd().Where("user_id = ?", user.Id).Desc("id").Limit(20))
+//	}
+//
+//	if len(favorites) > 0 {
+//		cursor = favorites[len(favorites)-1].Id
+//	}
+//
+//	return simple.JsonCursorData(render.BuildFavorites(favorites), strconv.FormatInt(cursor, 10))
+//}
 
 // 获取最近3条未读消息
-func (c *UserController) GetMsgrecent() *simple.JsonResult {
-	user := services.UserTokenService.GetCurrent(c.Ctx)
-	var count int64 = 0
-	var messages []model.Message
-	if user != nil {
-		count = services.MessageService.GetUnReadCount(user.Id)
-		messages = services.MessageService.Find(simple.NewSqlCnd().Eq("user_id", user.Id).Eq("status", model.MsgStatusUnread).Limit(3).Desc("id"))
-	}
-	return simple.NewEmptyRspBuilder().Put("count", count).Put("messages", render.BuildMessages(messages)).JsonResult()
-}
+//func (c *UserController) GetMsgrecent() *simple.JsonResult {
+//	user := services.UserTokenService.GetCurrent(c.Ctx)
+//	var count int64 = 0
+//	var messages []model.Message
+//	if user != nil {
+//		count = services.MessageService.GetUnReadCount(user.Id)
+//		messages = services.MessageService.Find(simple.NewSqlCnd().Eq("user_id", user.Id).Eq("status", model.MsgStatusUnread).Limit(3).Desc("id"))
+//	}
+//	return simple.NewEmptyRspBuilder().Put("count", count).Put("messages", render.BuildMessages(messages)).JsonResult()
+//}
 
 // 用户消息
-func (c *UserController) GetMessages() *simple.JsonResult {
-	user := services.UserTokenService.GetCurrent(c.Ctx)
-	page := simple.FormValueIntDefault(c.Ctx, "page", 1)
-
-	// 用户必须登录
-	if user == nil {
-		return simple.JsonError(simple.ErrorNotLogin)
-	}
-
-	messages, paging := services.MessageService.FindPageByCnd(simple.NewSqlCnd().
-		Eq("user_id", user.Id).
-		Page(page, 20).Desc("id"))
-
-	// 全部标记为已读
-	services.MessageService.MarkRead(user.Id)
-
-	return simple.JsonPageData(render.BuildMessages(messages), paging)
-}
+//func (c *UserController) GetMessages() *simple.JsonResult {
+//	user := services.UserTokenService.GetCurrent(c.Ctx)
+//	page := simple.FormValueIntDefault(c.Ctx, "page", 1)
+//
+//	// 用户必须登录
+//	if user == nil {
+//		return simple.JsonError(simple.ErrorNotLogin)
+//	}
+//
+//	messages, paging := services.MessageService.FindPageByCnd(simple.NewSqlCnd().
+//		Eq("user_id", user.Id).
+//		Page(page, 20).Desc("id"))
+//
+//	// 全部标记为已读
+//	services.MessageService.MarkRead(user.Id)
+//
+//	return simple.JsonPageData(render.BuildMessages(messages), paging)
+//}
 
 // 最新用户
 func (c *UserController) GetNewest() *simple.JsonResult {

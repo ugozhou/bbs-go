@@ -13,6 +13,7 @@ import (
 	"bbs-go/common/config"
 )
 
+//阿里的对象存储服务封装
 // 上传图片
 func PutImage(data []byte) (string, error) {
 	md5 := simple.MD5Bytes(data)

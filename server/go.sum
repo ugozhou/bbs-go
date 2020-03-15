@@ -198,13 +198,6 @@ github.com/microcosm-cc/bluemonday v1.0.2 h1:5lPfLTTAvAbtS0VqT+94yOtFnGfUWYyx0+i
 github.com/microcosm-cc/bluemonday v1.0.2/go.mod h1:iVP4YcDBq+n/5fb23BhYFvIMq/leAFZyRl6bYmGDlGc=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
-github.com/mlogclub/simple v1.0.50 h1:XTH1NzIcPqddDZyh2K33oJt/KHv7ylsFlBbI6BHPZYs=
-github.com/mlogclub/simple v1.0.50/go.mod h1:J5p18ObwMAb7pJ8nodcHuZrmU0G3bnoFX2VEzeuj5Os=
-github.com/mlogclub/simple v1.0.52 h1:EIpssLl7sc/pm6z8whKbtncH+GAwpkQCyRw3tPmQ+DA=
-github.com/mlogclub/simple v1.0.52/go.mod h1:J5p18ObwMAb7pJ8nodcHuZrmU0G3bnoFX2VEzeuj5Os=
-github.com/mlogclub/simple v1.0.53/go.mod h1:J5p18ObwMAb7pJ8nodcHuZrmU0G3bnoFX2VEzeuj5Os=
-github.com/mlogclub/simple v1.0.54 h1:+x98WemmzSS0KBraFCW4SuFGDlfnmSsSN8WICt4hkEc=
-github.com/mlogclub/simple v1.0.54/go.mod h1:J5p18ObwMAb7pJ8nodcHuZrmU0G3bnoFX2VEzeuj5Os=
 github.com/mlogclub/simple v1.0.55 h1:ID+XfshJHo8A9dbMMExFQ2Mfohj8DFn5GolVv609Oyo=
 github.com/mlogclub/simple v1.0.55/go.mod h1:J5p18ObwMAb7pJ8nodcHuZrmU0G3bnoFX2VEzeuj5Os=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w8PVh93nsPXa1VrQ6jlwL5oN8l14QlcNfg=

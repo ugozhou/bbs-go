@@ -39,7 +39,7 @@ func (api *WxbotApi) initUser(article *WxArticle) (int64, error) {
 	user := services.UserService.GetByUsername(article.AppID)
 	if user != nil {
 		user.Nickname = article.AppName
-		user.Description = article.WxIntro
+		//user.Description = article.WxIntro
 		_ = services.UserService.Update(user)
 		return user.Id, nil
 	} else {
@@ -48,14 +48,15 @@ func (api *WxbotApi) initUser(article *WxArticle) (int64, error) {
 			return 0, err
 		}
 		user := &model.User{
-			Username:    simple.SqlNullString(article.AppID),
-			Nickname:    article.AppName,
-			Description: article.WxIntro,
-			Avatar:      avatar,
-			Status:      model.StatusOk,
-			Type:        model.UserTypeGzh,
-			CreateTime:  simple.NowTimestamp(),
-			UpdateTime:  simple.NowTimestamp(),
+			//Username:    simple.SqlNullString(article.AppID),
+			Mobile:   article.AppID,
+			Nickname: article.AppName,
+			//Description: article.WxIntro,
+			Avatar:     avatar,
+			Status:     model.StatusOk,
+			Type:       model.UserTypeGzh,
+			CreateTime: simple.NowTimestamp(),
+			UpdateTime: simple.NowTimestamp(),
 		}
 		err = services.UserService.Create(user)
 		if err != nil {

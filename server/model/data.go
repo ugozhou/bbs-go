@@ -6,10 +6,10 @@ type SiteNav struct {
 	Url   string `json:"url"`
 }
 
-// 积分配置
+// 算力配置
 type ScoreConfig struct {
-	PostTopicScore   int `json:"postTopicScore"`   // 发帖获得积分
-	PostCommentScore int `json:"postCommentScore"` // 跟帖获得积分
+	SelfBuyScore          int `json:"postTopicScore"`   // 自身购买算力
+	IntroducerRewardScore int `json:"postCommentScore"` // 介绍人奖励获取
 }
 
 // 配置返回结构体

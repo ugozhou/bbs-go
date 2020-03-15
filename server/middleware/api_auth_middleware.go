@@ -36,6 +36,32 @@ func AdminAuth(ctx iris.Context) {
 	ctx.Next()
 }
 
+func LoginAuth(ctx iris.Context) {
+	token := getUserToken(ctx)
+	userToken := cache.UserTokenCache.Get(token)
+
+	// 没找到授权
+	if userToken == nil || userToken.Status == model.StatusDeleted {
+		notLogin(ctx)
+		return
+	}
+	// 授权过期
+	if userToken.ExpiredAt <= simple.NowTimestamp() {
+		notLogin(ctx)
+		return
+	}
+
+	//user := cache.UserCache.Get(userToken.UserId)
+	//userInfo := render.BuildUser(user)
+	//if userInfo == nil {
+	//_, _ = ctx.JSON(simple.JsonErrorCode(2, "未"))
+	//ctx.StopExecution()
+	//return
+	//}
+
+	ctx.Next()
+}
+
 // 从请求体中获取UserToken
 func getUserToken(ctx iris.Context) string {
 	userToken := ctx.FormValue("userToken")

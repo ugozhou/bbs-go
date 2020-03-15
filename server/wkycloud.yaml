@@ -1,12 +1,12 @@
-Env: prod # 环境，线上环境：prod、测试环境：dev
-BaseUrl: https://mlog.club # 网站域名
+Env: dev # 环境，线上环境：prod、测试环境：dev
+BaseUrl: https://wky.cloud # 网站域名
 Port: 8082 # 端口
-LogFile: /data/logs/bbs-go.log # 日志文件
-ShowSql: false # 是否打印sql
-StaticPath: /data/www  # 根路径下的静态文件目录，可配置绝对路径
+LogFile: /Users/ugozhou/data/wkycloud-go.log # 日志文件
+ShowSql: true # 是否打印sql
+StaticPath: /Users/ugozhou/data/www  # 根路径下的静态文件目录，可配置绝对路径
 
 # 数据库连接
-MySqlUrl: username:password@tcp(localhost:3306)/bbsgo_db?charset=utf8mb4&parseTime=True&loc=Local
+MySqlUrl: root:123456@tcp(localhost:13306)/wkycloud?charset=utf8mb4&parseTime=True&loc=Local
 
 # github登录配置
 Github:
@@ -18,7 +18,7 @@ QQConnect:
   AppId:
   AppKey:
 
-# 阿里云oss配置
+# 阿里云oss配置,文件存储服务，需要购买
 AliyunOss:
   Host: 请配置成你自己的
   Bucket: 请配置成你自己的
@@ -33,6 +33,7 @@ AwsS3:
   Endpoint: 请配置成你自己的
   AccessId: 请配置成你自己的
   AccessSecret: 请配置成你自己的
+
 # 邮件服务器配置，用于邮件通知
 Smtp:
   Addr: smtp.qq.com
@@ -49,5 +50,5 @@ BaiduAi:
 # 百度SEO相关配置
 # 文档：https://ziyuan.baidu.com/college/courseinfo?id=267&page=2#h2_article_title14
 BaiduSEO:
-  Site: mlog.club
+  Site: wky.cloud
   Token: Y0b5JDk00GSjyMu3

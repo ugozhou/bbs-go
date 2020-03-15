@@ -6,8 +6,6 @@ import (
 
 	"bbs-go/common"
 	"bbs-go/model"
-	"bbs-go/services/cache"
-
 	"github.com/kataras/iris/v12"
 	"github.com/mlogclub/simple"
 
@@ -18,12 +16,12 @@ type UserController struct {
 	Ctx iris.Context
 }
 
-func (c *UserController) GetSynccount() *simple.JsonResult {
-	go func() {
-		services.UserService.SyncUserCount()
-	}()
-	return simple.JsonSuccess()
-}
+//func (c *UserController) GetSynccount() *simple.JsonResult {
+//	go func() {
+//		services.UserService.SyncUserCount()
+//	}()
+//	return simple.JsonSuccess()
+//}
 
 func (c *UserController) GetBy(id int64) *simple.JsonResult {
 	t := services.UserService.Get(id)
@@ -43,12 +41,11 @@ func (c *UserController) AnyList() *simple.JsonResult {
 }
 
 func (c *UserController) PostCreate() *simple.JsonResult {
-	username := simple.FormValue(c.Ctx, "username")
-	email := simple.FormValue(c.Ctx, "email")
-	nickname := simple.FormValue(c.Ctx, "nickname")
+	phone := simple.FormValue(c.Ctx, "phone")
+	inviteCode := simple.FormValue(c.Ctx, "inviteCode")
 	password := simple.FormValue(c.Ctx, "password")
 
-	user, err := services.UserService.SignUp(username, email, nickname, password, password)
+	user, err := services.UserService.SignUp(phone, inviteCode, password, password)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
@@ -56,12 +53,11 @@ func (c *UserController) PostCreate() *simple.JsonResult {
 }
 
 func (c *UserController) PostCreate2() *simple.JsonResult {
-	username := simple.FormValue(c.Ctx, "username")
-	email := simple.FormValue(c.Ctx, "email")
-	nickname := simple.FormValue(c.Ctx, "nickname")
+	phone := simple.FormValue(c.Ctx, "phone")
+	inviteCode := simple.FormValue(c.Ctx, "inviteCode")
 	password := simple.FormValue(c.Ctx, "password")
 
-	user, err := services.UserService.SignUp(username, email, nickname, password, password)
+	user, err := services.UserService.SignUp(phone, inviteCode, password, password)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
@@ -87,25 +83,18 @@ func (c *UserController) PostUpdate() *simple.JsonResult {
 		return simple.JsonErrorMsg("entity not found")
 	}
 
-	username := simple.FormValue(c.Ctx, "username")
 	password := simple.FormValue(c.Ctx, "password")
 	nickname := simple.FormValue(c.Ctx, "nickname")
-	email := simple.FormValue(c.Ctx, "email")
 	roles := simple.FormValueStringArray(c.Ctx, "roles")
 	status := simple.FormValueIntDefault(c.Ctx, "status", -1)
 
-	if len(username) > 0 {
-		t.Username = simple.SqlNullString(username)
-	}
 	if len(password) > 0 {
 		t.Password = simple.EncodePassword(t.Password)
 	}
 	if len(nickname) > 0 {
 		t.Nickname = nickname
 	}
-	if len(email) > 0 {
-		t.Email = simple.SqlNullString(email)
-	}
+
 	if status != -1 {
 		t.Status = status
 	}
@@ -120,11 +109,9 @@ func (c *UserController) PostUpdate() *simple.JsonResult {
 }
 
 func (c *UserController) buildUserItem(user *model.User) map[string]interface{} {
-	score := cache.UserCache.GetScore(user.Id)
 	return simple.NewRspBuilder(user).
 		Put("roles", common.GetUserRoles(user.Roles)).
-		Put("username", user.Username.String).
-		Put("email", user.Email.String).
-		Put("score", score).
+		Put("phone", user.Mobile).
+		Put("nickName", user.Nickname).
 		Build()
 }

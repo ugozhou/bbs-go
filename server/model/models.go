@@ -2,16 +2,20 @@ package model
 
 import (
 	"database/sql"
+	"github.com/jinzhu/gorm"
 )
 
 var Models = []interface{}{
-	&User{}, &UserToken{}, &Tag{}, &Article{}, &ArticleTag{}, &Comment{}, &Favorite{},
-	&Topic{}, &TopicNode{}, &TopicTag{}, &TopicLike{}, &Message{}, &SysConfig{}, &Project{}, &Link{},
-	&ThirdAccount{}, &Sitemap{}, &UserScore{}, &UserScoreLog{},
+	&User{}, &UserToken{}, &Tag{}, &Article{}, &ArticleTag{}, &SysConfig{}, &Project{},
+	&ThirdAccount{}, &UserScore{}, &UserScoreLog{}, &UserAssert{}, &UserAssertLog{}, &Waiter{}, &Notice{},
 }
 
 type Model struct {
 	Id int64 `gorm:"PRIMARY_KEY;AUTO_INCREMENT" json:"id" form:"id"`
+}
+
+type ModelInt struct {
+	Id int `gorm:"PRIMARY_KEY;AUTO_INCREMENT" json:"id" form:"id"`
 }
 
 const (
@@ -36,6 +40,7 @@ const (
 
 	ThirdAccountTypeGithub = "github"
 	ThirdAccountTypeQQ     = "qq"
+	ThirdAccountTypeWechat = "wechat"
 
 	ScoreTypeIncr = 0 // 积分+
 	ScoreTypeDecr = 1 // 积分-
@@ -46,20 +51,18 @@ const (
 
 type User struct {
 	Model
-	Username     sql.NullString `gorm:"size:32;unique;" json:"username" form:"username"`            // 用户名
-	Email        sql.NullString `gorm:"size:128;unique;" json:"email" form:"email"`                 // 邮箱
-	Nickname     string         `gorm:"size:16;" json:"nickname" form:"nickname"`                   // 昵称
-	Avatar       string         `gorm:"type:text" json:"avatar" form:"avatar"`                      // 头像
-	Password     string         `gorm:"size:512" json:"password" form:"password"`                   // 密码
-	HomePage     string         `gorm:"size:1024" json:"homePage" form:"homePage"`                  // 个人主页
-	Description  string         `gorm:"type:text" json:"description" form:"description"`            // 个人描述
-	Status       int            `gorm:"index:idx_user_status;not null" json:"status" form:"status"` // 状态
-	TopicCount   int            `gorm:"not null" json:"topicCount" form:"topicCount"`               // 帖子数量
-	CommentCount int            `gorm:"not null" json:"commentCount" form:"commentCount"`           // 跟帖数量
-	Roles        string         `gorm:"type:text" json:"roles" form:"roles"`                        // 角色
-	Type         int            `gorm:"not null" json:"type" form:"type"`                           // 用户类型
-	CreateTime   int64          `json:"createTime" form:"createTime"`                               // 创建时间
-	UpdateTime   int64          `json:"updateTime" form:"updateTime"`                               // 更新时间
+	Mobile      string `gorm:"size:32;unique;" json:"mobile" form:"mobile"`                // 用户名
+	Nickname    string `gorm:"size:16;" json:"nickname" form:"nickname"`                   // 昵称
+	Avatar      string `gorm:"type:text" json:"avatar" form:"avatar"`                      // 头像
+	Password    string `gorm:"size:512" json:"password" form:"password"`                   // 密码
+	Paypassword string `gorm:"size:16" json:"payPassword" form:"payPassword"`              // 支付密码
+	Status      int    `gorm:"index:idx_user_status;not null" json:"status" form:"status"` // 状态
+	InviteCode  string `gorm:"not null" json:"inviteCode" form:"inviteCode"`               // 邀请码
+	Roles       string `gorm:"type:text" json:"roles" form:"roles"`                        // 角色
+	Type        int    `gorm:"not null" json:"type" form:"type"`                           // 用户类型
+	CreateTime  int64  `json:"createTime" form:"createTime"`                               // 创建时间
+	UpdateTime  int64  `json:"updateTime" form:"updateTime"`                               // 更新时间
+	Introducer  int64  `gorm:not null; json:"introducer" form:"introducer"`                //介绍人
 }
 
 type UserToken struct {
@@ -211,19 +214,15 @@ type SysConfig struct {
 	UpdateTime  int64  `gorm:"not null" json:"updateTime" form:"updateTime"`   // 更新时间
 }
 
-// 开源项目
+// 矿机数据
 type Project struct {
-	Model
-	UserId      int64  `gorm:"not null" json:"userId" form:"userId"`
-	Name        string `gorm:"type:varchar(1024)" json:"name" form:"name"`
-	Title       string `gorm:"type:text" json:"title" form:"title"`
-	Logo        string `gorm:"type:varchar(1024)" json:"logo" form:"logo"`
-	Url         string `gorm:"type:varchar(1024)" json:"url" form:"url"`
-	DocUrl      string `gorm:"type:varchar(1024)" json:"docUrl" form:"docUrl"`
-	DownloadUrl string `gorm:"type:varchar(1024)" json:"downloadUrl" form:"downloadUrl"`
-	ContentType string `gorm:"type:varchar(32);" json:"contentType" form:"contentType"`
-	Content     string `gorm:"type:longtext" json:"content" form:"content"`
-	CreateTime  int64  `gorm:"index:idx_project_create_time" json:"createTime" form:"createTime"`
+	ModelInt
+	Name     string `gorm:"type:varchar(128)" json:"name" form:"name"`   //矿机名字
+	Logo     string `gorm:"type:varchar(1024)" json:"logo" form:"logo"`  //图片地址
+	Type     uint   `gorm:"not null;" json:"type" form:"type"`           //矿机类型
+	Price    int64  `gorm:"not null;" json:"price" form:"price"`         //矿机价格
+	Capacity int    `gorm:"type:varchar(32);" json:"price" form:"price"` //矿机容量，1T，300T
+	Content  string `gorm:"type:longtext" json:"content" form:"content"` //描述信息
 }
 
 // 友链
@@ -246,23 +245,65 @@ type Sitemap struct {
 	CreateTime int64  `gorm:"not null" json:"createTime" form:"createTime"`          // 创建时间
 }
 
-// 用户积分
+// 用户算力矿机信息
 type UserScore struct {
 	Model
-	UserId     int64 `gorm:"unique;not null" json:"userId" form:"userId"` // 用户编号
-	Score      int   `gorm:"not null" json:"score" form:"score"`          // 积分
-	CreateTime int64 `json:"createTime" form:"createTime"`                // 创建时间
-	UpdateTime int64 `json:"updateTime" form:"updateTime"`                // 更新时间
+	UserId      int64 `gorm:"unique;not null" json:"userId" form:"userId"`    // 用户编号
+	Score       int   `gorm:"not null" json:"score" form:"score"`             // 自购算力
+	RewardScore int   `gorm:"not null" json:"rewardScore" form:"rewardScore"` // 奖励算力
+	Level       int   `gorm:"not null" json:"level" form:"level"`             // 等级
+	CreateTime  int64 `json:"createTime" form:"createTime"`                   // 创建时间
+	UpdateTime  int64 `json:"updateTime" form:"updateTime"`                   // 更新时间
 }
 
-// 用户积分流水
+// 用户算力矿机流水信息
 type UserScoreLog struct {
 	Model
-	UserId      int64  `gorm:"not null;index:idx_user_score_log_user_id" json:"userId" form:"userId"`   // 用户编号
-	SourceType  string `gorm:"not null;index:idx_user_score_score" json:"sourceType" form:"sourceType"` // 积分来源类型
-	SourceId    string `gorm:"not null;index:idx_user_score_score" json:"sourceId" form:"sourceId"`     // 积分来源编号
-	Description string `json:"description" form:"description"`                                          // 描述
-	Type        int    `json:"type" form:"type"`                                                        // 类型(增加、减少)
-	Score       int    `json:"score" form:"score"`                                                      // 积分
-	CreateTime  int64  `json:"createTime" form:"createTime"`                                            // 创建时间
+	UserId      int64  `gorm:"not null;index:idx_user_score_log_user_id" json:"userId" form:"userId"` // 用户编号
+	Catalog     int    `gorm:"not null;index:idx_user_score_catalog" json:"catalog" form:"catalog"`   // 流水分类
+	Description string `json:"description" form:"description"`                                        // 描述
+	Type        int    `json:"type" form:"type"`                                                      // 类型(增加、减少)
+	Score       int    `json:"score" form:"score"`                                                    // 积分
+	CreateTime  int64  `json:"createTime" form:"createTime"`                                          // 创建时间
+}
+
+// 用户资产
+type UserAssert struct {
+	Model
+	UserId  int64  `gorm:"unique;not null;idx_user_assert_user_id" json:"user_id" form:"userId"` //用户编号
+	USDT    int64  `gorm:"default:0"json:"usdt" form:"usdt"`                                     //usdt数量
+	Address string `gorm:"unique;notnull;idx_user_usdt_address" json:"address" form:"address"`   //usdt钱包充值地址
+}
+
+// USDT充值记录
+type UserAssertLog struct {
+	Model
+	UserId      int64  `gorm:"not null;index:idx_user_assert_log_id" json:"user_id" form:"userId"` //用户编号
+	Amount      int64  `gorm:"not null;"`                                                          //交易数量
+	Type        uint8  `gorm:"not null" json:"type" form:"type"`                                   //交易类型（增加，减少）
+	Description string `json:"description" form:"description"`                                     // 描述
+}
+
+// 用户FIL流水
+type UserFILLog struct {
+	gorm.Model
+	UserId int64 `gorm:"unique;not null;idx_user_assert_user_id" json:"user_id" form:"userId"` //用户编号
+	Amount int32 `gorm:"not null;"`                                                            //交易数量
+	Type   uint8 `gorm:"not null"`                                                             //记录类型
+}
+
+//	客服信息
+type Waiter struct {
+	ModelInt
+	Name   string `gorm:"unique;not null;" json:"name" form:"name"`     //客服名称
+	Wechat string `gorm:"unique;not null;" json:"wechat" form:"wechat"` //微信号
+	Phone  int    `gorm:"unique;not null;" json:"phone" form:"phone"`   //电话号码
+}
+
+// 公告信息
+type Notice struct {
+	ModelInt
+	Title      string `gorm:"not null;" json:"title" form:"title"`           //公告标题
+	Content    string `gorm:"not null;" json:"content" form:"content"`       //内容详情
+	CreateTime int64  `gorm:"not null;" json:"createTime" form:"createTime"` //创建时间
 }

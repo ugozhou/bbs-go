@@ -1,15 +1,11 @@
 package services
 
 import (
-	"errors"
-	"strconv"
-
-	"github.com/mlogclub/simple"
-	"github.com/sirupsen/logrus"
-
 	"bbs-go/model"
 	"bbs-go/repositories"
 	"bbs-go/services/cache"
+	"errors"
+	"github.com/mlogclub/simple"
 )
 
 var UserScoreService = newUserScoreService()
@@ -77,58 +73,90 @@ func (s *userScoreService) CreateOrUpdate(t *model.UserScore) error {
 	}
 }
 
-// IncrementCreateTopicScore 发帖获积分
-func (s *userScoreService) IncrementPostTopicScore(topic *model.Topic) {
-	config := SysConfigService.GetConfig()
-	if config.ScoreConfig.PostTopicScore <= 0 {
-		logrus.Info("请配置发帖积分")
-		return
-	}
-	err := s.addScore(topic.UserId, config.ScoreConfig.PostTopicScore, model.EntityTypeTopic,
-		strconv.FormatInt(topic.Id, 10), "发表话题")
+//自购买矿机
+func (s *userScoreService) IncrementSelfBuyScore(user *model.User, amount int) (error, *model.UserScore) {
+
+	err, userScore := s.addScore(user.Id, amount, model.SelfBuy, "购买矿机")
 	if err != nil {
-		logrus.Error(err)
+		return err, nil
 	}
-}
-
-// IncrementPostCommentScore 跟帖获积分
-func (s *userScoreService) IncrementPostCommentScore(comment *model.Comment) {
-	// 非话题跟帖，跳过
-	if comment.EntityType != model.EntityTypeTopic {
-		return
-	}
-	config := SysConfigService.GetConfig()
-	if config.ScoreConfig.PostCommentScore <= 0 {
-		logrus.Info("请配置跟帖积分")
-		return
-	}
-	err := s.addScore(comment.UserId, config.ScoreConfig.PostCommentScore, model.EntityTypeComment,
-		strconv.FormatInt(comment.Id, 10), "发表跟帖")
+	s.checkAndLevlup(userScore)
+	//查找用户推荐人，处理推荐奖励逻辑
+	//此处暂且给介绍人增加1T
+	err, userScore = s.addScore(user.Introducer, 1, model.InviatorReward, "邀请奖励")
 	if err != nil {
-		logrus.Error(err)
+		return err, nil
 	}
+	s.checkAndLevlup(userScore)
+	//检查用户的等级变化
+
+	return nil, userScore
 }
 
-// Increment 增加分数
-func (s *userScoreService) Increment(userId int64, score int, sourceType, sourceId, description string) error {
-	if score <= 0 {
-		return errors.New("分数必须为正数")
+//检查并升级用户等级
+func (s *userScoreService) checkAndLevlup(userScore *model.UserScore) {
+	oldLevel := userScore.Level
+	selfScore := userScore.Score
+	rewardScore := userScore.RewardScore
+	totalScore := selfScore + rewardScore
+	level := 0
+
+	if selfScore >= 300 {
+		level = 5
+	} else if selfScore >= 100 && totalScore >= 2000 {
+		level = 4
+	} else if selfScore >= 50 && totalScore >= 500 {
+		level = 3
+	} else if selfScore >= 10 && totalScore >= 100 {
+		level = 2
+	} else if selfScore >= 0 && totalScore > 0 {
+		level = 1
 	}
-	return s.addScore(userId, score, sourceType, sourceId, description)
+	if oldLevel != level {
+		userScore.Level = level
+		repositories.UserScoreRepository.Update(simple.DB(), userScore)
+	}
+
 }
 
-// Decrement 减少分数
-func (s *userScoreService) Decrement(userId int64, score int, sourceType, sourceId, description string) error {
-	if score <= 0 {
-		return errors.New("分数必须为正数")
-	}
-	return s.addScore(userId, -score, sourceType, sourceId, description)
-}
+//// IncrementPostCommentScore 跟帖获积分
+//func (s *userScoreService) IncrementPostCommentScore(comment *model.Comment) {
+//	// 非话题跟帖，跳过
+//	if comment.EntityType != model.EntityTypeTopic {
+//		return
+//	}
+//	config := SysConfigService.GetConfig()
+//	if config.ScoreConfig.IntroducerRewardScore <= 0 {
+//		logrus.Info("请配置跟帖积分")
+//		return
+//	}
+//	err := s.addScore(comment.UserId, config.ScoreConfig.IntroducerRewardScore, model.EntityTypeComment,
+//		strconv.FormatInt(comment.Id, 10), "发表跟帖")
+//	if err != nil {
+//		logrus.Error(err)
+//	}
+//}
+
+//// Increment 增加算力
+//func (s *userScoreService) Increment(userId int64, score int, sourceType, sourceId, description string) error {
+//	if score <= 0 {
+//		return errors.New("分数必须为正数")
+//	}
+//	return s.addScore(userId, score, sourceType, sourceId, description)
+//}
+
+//// Decrement 减少分数
+//func (s *userScoreService) Decrement(userId int64, score int, sourceType, sourceId, description string) error {
+//	if score <= 0 {
+//		return errors.New("分数必须为正数")
+//	}
+//	return s.addScore(userId, -score, sourceType, sourceId, description)
+//}
 
 // addScore 加分数，也可以加负数
-func (s *userScoreService) addScore(userId int64, score int, sourceType, sourceId, description string) error {
+func (s *userScoreService) addScore(userId int64, score int, catalog int, description string) (error, *model.UserScore) {
 	if score == 0 {
-		return errors.New("分数不能为0")
+		return errors.New("分数不能为0"), nil
 	}
 	userScore := s.GetByUserId(userId)
 	if userScore == nil {
@@ -140,7 +168,7 @@ func (s *userScoreService) addScore(userId int64, score int, sourceType, sourceI
 	userScore.Score = userScore.Score + score
 	userScore.UpdateTime = simple.NowTimestamp()
 	if err := s.CreateOrUpdate(userScore); err != nil {
-		return err
+		return err, nil
 	}
 
 	scoreType := model.ScoreTypeIncr
@@ -149,8 +177,7 @@ func (s *userScoreService) addScore(userId int64, score int, sourceType, sourceI
 	}
 	err := UserScoreLogService.Create(&model.UserScoreLog{
 		UserId:      userId,
-		SourceType:  sourceType,
-		SourceId:    sourceId,
+		Catalog:     catalog,
 		Description: description,
 		Type:        scoreType,
 		Score:       score,
@@ -159,5 +186,5 @@ func (s *userScoreService) addScore(userId int64, score int, sourceType, sourceI
 	if err == nil {
 		cache.UserCache.InvalidateScore(userId)
 	}
-	return err
+	return err, userScore
 }

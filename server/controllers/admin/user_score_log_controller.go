@@ -22,6 +22,7 @@ func (c *UserScoreLogController) GetBy(id int64) *simple.JsonResult {
 	return simple.JsonData(t)
 }
 
+//查看所有人的购买矿机记录
 func (c *UserScoreLogController) AnyList() *simple.JsonResult {
 	list, paging := services.UserScoreLogService.FindPageByParams(simple.NewQueryParams(c.Ctx).
 		EqByReq("user_id").EqByReq("source_type").EqByReq("source_id").EqByReq("type").PageByReq().Desc("id"))

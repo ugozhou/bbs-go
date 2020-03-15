@@ -7,8 +7,10 @@ import (
 	"bbs-go/model"
 )
 
+//这里应该是一个单例模式，生成userTokenRepository类型的一个实例,我觉得此处的代码是可以用模板生成的
 var UserTokenRepository = newUserTokenRepository()
 
+//隐藏构造函数
 func newUserTokenRepository() *userTokenRepository {
 	return &userTokenRepository{}
 }

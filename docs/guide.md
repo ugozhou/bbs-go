@@ -6,10 +6,6 @@ sidebar: auto
 
 ## 公众号
 
-> 欢迎关注公众号`码农俱乐部`获取更多干货资源。
-
-![码农俱乐部](https://open.weixin.qq.com/qr/code?username=gh_950827012b8d)
-
 ## 简介
 
 `bbs-go`是一个使用Go语言搭建的开源社区系统，采用前后端分离技术，Go语言提供api进行数据支撑，用户界面使用Nuxt.js进行渲染，后台界面基于element-ui。如果你正在学习Go语言，或者考虑转Go语言的Phper/Javaer...那么该项目对你有的学习会有很大的帮助，欢迎一起来交流。
@@ -25,12 +21,10 @@ sidebar: auto
 
 ## 项目地址
 
-- Github：[https://github.com/mlogclub/bbs-go](https://github.com/mlogclub/bbs-go)
-- 码云：[https://gitee.com/mlogclub/bbs-go](https://gitee.com/mlogclub/bbs-go)
+- Github：[https://github.com/mlogclub/bbs-go](https://github.com/ugozhou/bbs-go)
+- 码云：[https://gitee.com/mlogclub/bbs-go](https://gitee.com/ugozhou/bbs-go)
 
 ## 演示
-
-[https://mlog.club](https://mlog.club)
 
 ## 技术栈
 
@@ -45,7 +39,7 @@ sidebar: auto
 
 ## 获取源码
 
-`bbs-go`的源码托管在Github：[https://github.com/mlogclub/bbs-go](https://github.com/mlogclub/bbs-go)，通过以下命令将源代码克隆到本地：
+`bbs-go`的源码托管在Github：[https://github.com/mlogclub/bbs-go](https://github.com/ugozhou/bbs-go)，通过以下命令将源代码克隆到本地：
 
 ```bash
 git clone https://github.com/mlogclub/mlog.git
@@ -61,7 +55,7 @@ bbs-go采用前后端分离技术，网站和后台均使用`http api`进行数�
 
 ### site模块
 
-`site`模块使用`nuxt.js`进行搭建，该模块是bbs-go的用户前端网页。`nuxt.js`相关知识可以去它的官网查看：[https://nuxtjs.org](https://nuxtjs.org)
+`site`模块使用`nuxt.js`进行搭建，该模块是wkycoud的用户前端网页。`nuxt.js`相关知识可以去它的官网查看：[https://nuxtjs.org](https://nuxtjs.org)
 
 ## 配置详解
 
@@ -71,14 +65,14 @@ bbs-go采用前后端分离技术，网站和后台均使用`http api`进行数�
 
 ```yaml
 Env: prod # 环境，线上环境：prod、测试环境：dev
-BaseUrl: https://mlog.club # 网站域名
+BaseUrl:  # 网站域名
 Port: '8082' # 端口
-LogFile: /data/logs/bbs-go.log # 日志文件
+LogFile: /data/logs/wkycloud-go.log # 日志文件
 ShowSql: false # 是否打印sql
 StaticPath: /data/www  # 根路径下的静态文件目录，可配置绝对路径
 
 # 数据库连接
-MySqlUrl: username:password@tcp(localhost:3306)/bbsgo_db?charset=utf8mb4&parseTime=True&loc=Local
+MySqlUrl: username:password@tcp(localhost:3306)/wkycloud_mysql?charset=utf8mb4&parseTime=True&loc=Local
 
 # github登录配置
 Github:
@@ -111,7 +105,7 @@ BaiduAi:
   SecretKey:
 ```
 
-请复制该文件到：`server/bbs-go.yaml`，并根据配置文件中的注释将配置修改成你自己的。
+请复制该文件到：`server/wkycloud.yaml`，并根据配置文件中的注释将配置修改成你自己的。
 
 ### site模块配置
 
@@ -231,5 +225,3 @@ npm run dev
 
 ## 问题反馈
 
-- 欢迎交流：[https://mlog.club/topics](https://mlog.club/topics)
-- 提交建议：[https://mlog.club/topic/609](https://mlog.club/topic/609)
