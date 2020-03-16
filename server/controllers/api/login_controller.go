@@ -98,6 +98,19 @@ func (c *LoginController) GetVerifyinviatecode() *simple.JsonResult {
 	return simple.JsonSuccess()
 }
 
+//验证手机存在与否
+func (c *LoginController) GetVerifyphone() *simple.JsonResult {
+	phone := c.Ctx.FormValue("phone")
+	if len(phone) == 0 || !common.IsValidateMobile(phone) {
+		return simple.JsonErrorMsg("电话号码错误")
+	}
+	result := services.UserService.GetByMobile(phone)
+	if result != nil {
+		return simple.JsonErrorMsg("电话号码已经注册")
+	}
+	return simple.JsonSuccess()
+}
+
 // 退出登录
 func (c *LoginController) GetSignout() *simple.JsonResult {
 	err := services.UserTokenService.Signout(c.Ctx)
@@ -170,8 +183,6 @@ func (c *LoginController) GenerateLoginResult(user *model.User, ref string) *sim
 }
 
 func (c *LoginController) GetSendsms() *simple.JsonResult {
-
-	//captcha.RandomDigits(4)
 	phone := c.Ctx.FormValue("phone")
 	verifycode := common.GetRandomString(4)
 	phonecache.Put(phone, verifycode)
