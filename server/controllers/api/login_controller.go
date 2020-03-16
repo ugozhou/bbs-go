@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/dchest/captcha"
 	"github.com/kataras/iris/v12"
 	"github.com/mlogclub/simple"
 
@@ -45,15 +44,15 @@ func (c *LoginController) PostSignup() *simple.JsonResult {
 // 用户名密码登录
 func (c *LoginController) PostSignin() *simple.JsonResult {
 	var (
-		captchaId   = c.Ctx.PostValueTrim("captchaId")
-		captchaCode = c.Ctx.PostValueTrim("captchaCode")
-		phone       = c.Ctx.PostValueTrim("phone")
-		password    = c.Ctx.PostValueTrim("password")
-		ref         = c.Ctx.FormValue("ref")
+		//captchaId   = c.Ctx.PostValueTrim("captchaId")
+		//captchaCode = c.Ctx.PostValueTrim("captchaCode")
+		phone    = c.Ctx.PostValueTrim("phone")
+		password = c.Ctx.PostValueTrim("password")
+		ref      = c.Ctx.FormValue("ref")
 	)
-	if !captcha.VerifyString(captchaId, captchaCode) {
-		return simple.JsonError(common.CaptchaError)
-	}
+	//if !captcha.VerifyString(captchaId, captchaCode) {
+	//	return simple.JsonError(common.CaptchaError)
+	//}
 	user, err := services.UserService.SignIn(phone, password)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
