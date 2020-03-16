@@ -48,7 +48,7 @@ func (c *LoginController) PostSignup() *simple.JsonResult {
 		inviteCode  = c.Ctx.PostValueTrim("inviteCode")
 		messageCode = c.Ctx.PostValueTrim("messageCode")
 		password    = c.Ctx.PostValueTrim("password")
-		rePassword  = c.Ctx.PostValueTrim("rePassword")
+		//rePassword  = c.Ctx.PostValueTrim("rePassword")
 	)
 	if !common.IsValidateMobile(mobile) {
 		return simple.JsonError(common.MobileError)
