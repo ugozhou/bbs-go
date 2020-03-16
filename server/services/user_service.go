@@ -193,7 +193,7 @@ func (s *userService) SignIn(mobile, password string) (*model.User, error) {
 	if len(mobile) == 0 {
 		return nil, errors.New("电话不能为空")
 	}
-	if common.IsValidateMobile(mobile) {
+	if !common.IsValidateMobile(mobile) {
 		return nil, errors.New("电话号码格式不对")
 	}
 	if len(password) == 0 {
