@@ -41,45 +41,45 @@ func (c *UserController) GetScoreBy(userId int64) *simple.JsonResult {
 	return simple.NewEmptyRspBuilder().Put("score", score).JsonResult()
 }
 
-// 修改用户资料
-func (c *UserController) PostEditBy(userId int64) *simple.JsonResult {
-	user := services.UserTokenService.GetCurrent(c.Ctx)
-	if user == nil {
-		return simple.JsonError(simple.ErrorNotLogin)
-	}
-	if user.Id != userId {
-		return simple.JsonErrorMsg("无权限")
-	}
-	nickname := strings.TrimSpace(simple.FormValue(c.Ctx, "nickname"))
-	avatar := strings.TrimSpace(simple.FormValue(c.Ctx, "avatar"))
-	homePage := simple.FormValue(c.Ctx, "homePage")
-	description := simple.FormValue(c.Ctx, "description")
-
-	if len(nickname) == 0 {
-		return simple.JsonErrorMsg("昵称不能为空")
-	}
-	if len(avatar) == 0 {
-		return simple.JsonErrorMsg("头像不能为空")
-	}
-
-	if len(homePage) > 0 && common.IsValidateUrl(homePage) != nil {
-		return simple.JsonErrorMsg("个人主页地址错误")
-	}
-
-	err := services.UserService.Updates(user.Id, map[string]interface{}{
-		"nickname":    nickname,
-		"avatar":      avatar,
-		"home_page":   homePage,
-		"description": description,
-	})
-	if err != nil {
-		return simple.JsonErrorMsg(err.Error())
-	}
-	return simple.JsonSuccess()
-}
+//// 修改用户资料
+//func (c *UserController) PostEditBy(userId int64) *simple.JsonResult {
+//	user := services.UserTokenService.GetCurrent(c.Ctx)
+//	if user == nil {
+//		return simple.JsonError(simple.ErrorNotLogin)
+//	}
+//	if user.Id != userId {
+//		return simple.JsonErrorMsg("无权限")
+//	}
+//	nickname := strings.TrimSpace(simple.FormValue(c.Ctx, "nickname"))
+//	avatar := strings.TrimSpace(simple.FormValue(c.Ctx, "avatar"))
+//	homePage := simple.FormValue(c.Ctx, "homePage")
+//	description := simple.FormValue(c.Ctx, "description")
+//
+//	if len(nickname) == 0 {
+//		return simple.JsonErrorMsg("昵称不能为空")
+//	}
+//	if len(avatar) == 0 {
+//		return simple.JsonErrorMsg("头像不能为空")
+//	}
+//
+//	if len(homePage) > 0 && common.IsValidateUrl(homePage) != nil {
+//		return simple.JsonErrorMsg("个人主页地址错误")
+//	}
+//
+//	err := services.UserService.Updates(user.Id, map[string]interface{}{
+//		"nickname":    nickname,
+//		"avatar":      avatar,
+//		"home_page":   homePage,
+//		"description": description,
+//	})
+//	if err != nil {
+//		return simple.JsonErrorMsg(err.Error())
+//	}
+//	return simple.JsonSuccess()
+//}
 
 // 修改头像
-func (c *UserController) PostUpdateAvatar() *simple.JsonResult {
+func (c *UserController) PutAvatar() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
@@ -96,7 +96,7 @@ func (c *UserController) PostUpdateAvatar() *simple.JsonResult {
 }
 
 // 设置用户昵称
-func (c *UserController) PostSetNickname() *simple.JsonResult {
+func (c *UserController) PutNickname() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
@@ -124,7 +124,7 @@ func (c *UserController) PostSetNickname() *simple.JsonResult {
 //}
 
 // 设置支付密码
-func (c *UserController) PostSetPayPassword() *simple.JsonResult {
+func (c *UserController) PutPaypassword() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
@@ -143,7 +143,7 @@ func (c *UserController) PostSetPayPassword() *simple.JsonResult {
 }
 
 // 修改密码
-func (c *UserController) PostUpdatePassword() *simple.JsonResult {
+func (c *UserController) PutPassword() *simple.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if user == nil {
 		return simple.JsonError(simple.ErrorNotLogin)
@@ -160,7 +160,7 @@ func (c *UserController) PostUpdatePassword() *simple.JsonResult {
 	return simple.JsonSuccess()
 }
 
-func (c *UserController) PostForgetPassword() *simple.JsonResult {
+func (c *UserController) PutForgetpassword() *simple.JsonResult {
 	var (
 		mobile = c.Ctx.PostValueTrim("phone")
 		//captchaCode    = c.Ctx.PostValueTrim("captchaCode")
@@ -237,12 +237,6 @@ func (c *UserController) PostForgetPassword() *simple.JsonResult {
 //	return simple.JsonPageData(render.BuildMessages(messages), paging)
 //}
 
-// 最新用户
-func (c *UserController) GetNewest() *simple.JsonResult {
-	users := services.UserService.Find(simple.NewSqlCnd().Eq("type", model.UserTypeNormal).Desc("id").Limit(10))
-	return simple.JsonData(render.BuildUsers(users))
-}
-
 // 用户积分记录
 func (c *UserController) GetScorelogs() *simple.JsonResult {
 	page := simple.FormValueIntDefault(c.Ctx, "page", 1)
@@ -259,12 +253,24 @@ func (c *UserController) GetScorelogs() *simple.JsonResult {
 	return simple.JsonPageData(logs, paging)
 }
 
-// 积分排行
-func (c *UserController) GetScoreRank() *simple.JsonResult {
-	userScores := services.UserScoreService.Find(simple.NewSqlCnd().Desc("score").Limit(10))
-	var results []*model.UserInfo
-	for _, userScore := range userScores {
-		results = append(results, render.BuildUserDefaultIfNull(userScore.UserId))
+//查询当前用户的团队信息
+func (c *UserController) GetTeam() *simple.JsonResult {
+	user := services.UserTokenService.GetCurrent(c.Ctx)
+	// 用户必须登录
+	if user == nil {
+		return simple.JsonError(simple.ErrorNotLogin)
 	}
-	return simple.JsonData(results)
+	fellowers, paging := services.UserService.FindPageByCnd(simple.NewSqlCnd().Eq("introducer", user.Id))
+
+	return simple.JsonPageData(fellowers, paging)
 }
+
+//// 积分排行
+//func (c *UserController) GetScoreRank() *simple.JsonResult {
+//	userScores := services.UserScoreService.Find(simple.NewSqlCnd().Desc("score").Limit(10))
+//	var results []*model.UserInfo
+//	for _, userScore := range userScores {
+//		results = append(results, render.BuildUserDefaultIfNull(userScore.UserId))
+//	}
+//	return simple.JsonData(results)
+//}

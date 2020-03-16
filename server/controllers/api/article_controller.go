@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/kataras/iris/v12"
 	"github.com/mlogclub/simple"
 
@@ -14,12 +15,13 @@ type ArticleController struct {
 }
 
 // 文章详情
-func (c *ArticleController) GetBy(articleId int64) *simple.JsonResult {
-	article := services.ArticleService.Get(articleId)
-	if article == nil || article.Status != model.StatusOk {
-		return simple.JsonErrorMsg("文章不存在")
-	}
-	services.ArticleService.IncrViewCount(articleId) // 增加浏览量
+func (c *ArticleController) GetBy(id int64) *simple.JsonResult {
+	article := services.ArticleService.Get(id)
+	//if article == nil || article.Status != model.StatusOk {
+	//	return simple.JsonErrorMsg("文章不存在")
+	//}
+	fmt.Println("++++++++")
+	services.ArticleService.IncrViewCount(id) // 增加浏览量
 	return simple.JsonData(render.BuildArticle(article))
 }
 
@@ -187,7 +189,7 @@ func (c *ArticleController) PostDeleteBy(articleId int64) *simple.JsonResult {
 //}
 
 // 文章列表
-func (c *ArticleController) GetArticles() *simple.JsonResult {
+func (c *ArticleController) AnyList() *simple.JsonResult {
 	page := simple.FormValueIntDefault(c.Ctx, "page", 1)
 
 	list, paging := services.ArticleService.FindPageByParams(simple.NewQueryParams(c.Ctx).

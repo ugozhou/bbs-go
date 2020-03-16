@@ -311,10 +311,10 @@ func (s *userService) SetNickname(userId int64, username string) error {
 		return err
 	}
 
-	user := s.Get(userId)
-	if len(user.Nickname) > 0 {
-		return errors.New("你已设置了用户名，无法重复设置。")
-	}
+	//user := s.Get(userId)
+	//if len(user.Nickname) > 0 {
+	//	return errors.New("你已设置了用户名，无法重复设置。")
+	//}
 	if s.isNicknameExists(username) {
 		return errors.New("用户名：" + username + " 已被占用")
 	}

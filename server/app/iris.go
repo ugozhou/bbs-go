@@ -69,10 +69,8 @@ func InitIris() {
 		m.Party("/config").Handle(new(api.ConfigController))
 		m.Party("/upload").Handle(new(api.UploadController))
 
-		m.Party("/waiter").Handle(new(api.WaiterController))
 		m.Party("/assert").Handle(new(api.UserAssertController))
 		m.Party("/assertlog").Handle(new(api.UserAssertLogController))
-		m.Party("/notice").Handle(new(api.NoticeController))
 		m.Party("/user-score").Handle(new(api.UserScoreController))
 		m.Party("/user-score-log").Handle(new(api.UserScoreLogController))
 	})
@@ -82,6 +80,8 @@ func InitIris() {
 	mvc.Configure(app.Party("/"), func(m *mvc.Application) {
 		m.Party("/login").Handle(new(api.LoginController))
 		m.Party("/captcha").Handle(new(api.CaptchaController))
+		m.Party("/notice").Handle(new(api.NoticeController))
+		m.Party("/waiter").Handle(new(api.WaiterController))
 	})
 
 	// admin
