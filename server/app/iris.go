@@ -62,8 +62,6 @@ func InitIris() {
 	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
 		m.Router.Use(middleware.LoginAuth)
 		//m.Party("/topic").Handle(new(api.TopicController))
-		m.Party("/article").Handle(new(api.ArticleController))
-		m.Party("/project").Handle(new(api.ProjectController))
 		m.Party("/user").Handle(new(api.UserController))
 		m.Party("/tag").Handle(new(api.TagController))
 		m.Party("/config").Handle(new(api.ConfigController))
@@ -82,6 +80,8 @@ func InitIris() {
 		m.Party("/captcha").Handle(new(api.CaptchaController))
 		m.Party("/notice").Handle(new(api.NoticeController))
 		m.Party("/waiter").Handle(new(api.WaiterController))
+		m.Party("/article").Handle(new(api.ArticleController))
+		m.Party("/project").Handle(new(api.ProjectController))
 	})
 
 	// admin
