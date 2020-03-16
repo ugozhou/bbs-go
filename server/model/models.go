@@ -57,7 +57,7 @@ type User struct {
 	Password    string `gorm:"size:512" json:"password" form:"password"`                   // 密码
 	Paypassword string `gorm:"size:16" json:"payPassword" form:"payPassword"`              // 支付密码
 	Status      int    `gorm:"index:idx_user_status;not null" json:"status" form:"status"` // 状态
-	InviteCode  string `gorm:"not null" json:"inviteCode" form:"inviteCode"`               // 邀请码
+	Invitecode  string `gorm:"not null;size:512" json:"invitecode" form:"invitecode"`      // 邀请码
 	Roles       string `gorm:"type:text" json:"roles" form:"roles"`                        // 角色
 	Type        int    `gorm:"not null" json:"type" form:"type"`                           // 用户类型
 	CreateTime  int64  `json:"createTime" form:"createTime"`                               // 创建时间

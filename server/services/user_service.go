@@ -8,7 +8,6 @@ import (
 	"bbs-go/common/avatar"
 	"bbs-go/common/oss"
 	"bbs-go/services/cache"
-	"github.com/jinzhu/gorm"
 	"github.com/mlogclub/simple"
 
 	"bbs-go/model"
@@ -157,33 +156,35 @@ func (s *userService) SignUp(phone, inviteCode, password, rePassword string) (*m
 
 	user := &model.User{
 		Mobile:     phone,
-		InviteCode: common.GetRandomString(6),  //生成一个邀请码,此处邀请码是否会产生相同的？？TODO
+		Invitecode: common.GetRandomString(6),  //生成一个邀请码,此处邀请码是否会产生相同的？？TODO
 		Nickname:   common.GetRandomString(10), //先随机生成一个
 		Password:   simple.EncodePassword(password),
 		Status:     model.StatusOk,
 		CreateTime: simple.NowTimestamp(),
 		UpdateTime: simple.NowTimestamp(),
 	}
-
-	err = simple.Tx(simple.DB(), func(tx *gorm.DB) error {
-		if err := repositories.UserRepository.Create(tx, user); err != nil {
-			return err
-		}
-
-		avatarUrl, err := s.HandleAvatar(user.Id, "")
-		if err != nil {
-			return err
-		}
-
-		if err := repositories.UserRepository.UpdateColumn(tx, user.Id, "avatar", avatarUrl); err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err != nil {
+	if err := repositories.UserRepository.Create(simple.DB(), user); err != nil {
 		return nil, err
 	}
+	//err = simple.Tx(simple.DB(), func(tx *gorm.DB) error {
+	//	if err := repositories.UserRepository.Create(tx, user); err != nil {
+	//		return err
+	//	}
+	//
+	//	avatarUrl, err := s.HandleAvatar(user.Id, "")
+	//	if err != nil {
+	//		return err
+	//	}
+	//
+	//	if err := repositories.UserRepository.UpdateColumn(tx, user.Id, "avatar", avatarUrl); err != nil {
+	//		return err
+	//	}
+	//	return nil
+	//})
+	//
+	//if err != nil {
+	//	return nil, err
+	//}
 	return user, nil
 }
 
