@@ -82,6 +82,13 @@ func InitIris() {
 		m.Party("/user-score-log").Handle(new(api.UserScoreLogController))
 	})
 
+	// api
+	//配置控制器组，
+	mvc.Configure(app.Party("/"), func(m *mvc.Application) {
+		m.Party("/login").Handle(new(api.LoginController))
+
+	})
+
 	// admin
 	mvc.Configure(app.Party("/api/admin"), func(m *mvc.Application) {
 		m.Router.Use(middleware.AdminAuth)
