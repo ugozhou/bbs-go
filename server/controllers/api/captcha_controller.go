@@ -13,10 +13,10 @@ type CaptchaController struct {
 	Ctx iris.Context
 }
 
-//api/captcha/show?captchaId=e9a80cMqvhpPX9ySFSkh
+///captcha/show?captchaId=e9a80cMqvhpPX9ySFSkh
 func (c *CaptchaController) GetRequest() *simple.JsonResult {
 	captchaId := captcha.NewLen(4)
-	captchaUrl := urls.AbsUrl("/api/captcha/show?captchaId=" + captchaId)
+	captchaUrl := urls.AbsUrl("/captcha/show?captchaId=" + captchaId)
 	return simple.NewEmptyRspBuilder().
 		Put("captchaId", captchaId).
 		Put("captchaUrl", captchaUrl).
