@@ -64,20 +64,15 @@ func InitIris() {
 		//m.Party("/topic").Handle(new(api.TopicController))
 		m.Party("/article").Handle(new(api.ArticleController))
 		m.Party("/project").Handle(new(api.ProjectController))
-		m.Party("/login").Handle(new(api.LoginController))
 		m.Party("/user").Handle(new(api.UserController))
 		m.Party("/tag").Handle(new(api.TagController))
-		//m.Party("/comment").Handle(new(api.CommentController))
-		//m.Party("/favorite").Handle(new(api.FavoriteController))
 		m.Party("/config").Handle(new(api.ConfigController))
 		m.Party("/upload").Handle(new(api.UploadController))
-		//m.Party("/link").Handle(new(api.LinkController))
-		m.Party("/captcha").Handle(new(api.CaptchaController))
+
 		m.Party("/waiter").Handle(new(api.WaiterController))
 		m.Party("/assert").Handle(new(api.UserAssertController))
 		m.Party("/assertlog").Handle(new(api.UserAssertLogController))
 		m.Party("/notice").Handle(new(api.NoticeController))
-		//m.Party("/spider").Handle(new(api.SpiderController))
 		m.Party("/user-score").Handle(new(api.UserScoreController))
 		m.Party("/user-score-log").Handle(new(api.UserScoreLogController))
 	})
@@ -86,7 +81,7 @@ func InitIris() {
 	//配置控制器组，
 	mvc.Configure(app.Party("/"), func(m *mvc.Application) {
 		m.Party("/login").Handle(new(api.LoginController))
-
+		m.Party("/captcha").Handle(new(api.CaptchaController))
 	})
 
 	// admin
@@ -97,13 +92,8 @@ func InitIris() {
 		m.Party("/third-account").Handle(new(admin.ThirdAccountController))
 		m.Party("/tag").Handle(new(admin.TagController))
 		m.Party("/article").Handle(new(admin.ArticleController))
-		//m.Party("/comment").Handle(new(admin.CommentController))
-		//m.Party("/favorite").Handle(new(admin.FavoriteController))
 		m.Party("/article-tag").Handle(new(admin.ArticleTagController))
-		//m.Party("/topic").Handle(new(admin.TopicController))
-		//m.Party("/topic-node").Handle(new(admin.TopicNodeController))
 		m.Party("/sys-config").Handle(new(admin.SysConfigController))
-		//m.Party("/link").Handle(new(admin.LinkController))
 		m.Party("/user-score").Handle(new(admin.UserScoreController))
 		m.Party("/user-score-log").Handle(new(admin.UserScoreLogController))
 	})
