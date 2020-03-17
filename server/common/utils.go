@@ -122,6 +122,20 @@ func IsValidatePassword(password, rePassword string) error {
 	return nil
 }
 
+// 是否是合法的密码
+func IsValidatePayPassword(password, rePassword string) error {
+	if len(password) == 0 {
+		return errors.New("请输入支付密码")
+	}
+	if simple.RuneLen(password) != 6 {
+		return errors.New("密码为六位")
+	}
+	if password != rePassword {
+		return errors.New("两次输入密码不匹配")
+	}
+	return nil
+}
+
 // 是否是合法的URL
 func IsValidateUrl(url string) error {
 	if len(url) == 0 {

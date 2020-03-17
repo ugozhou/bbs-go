@@ -116,11 +116,15 @@ func (s *userService) GetByMobile(mobile string) *model.User {
 }
 
 // SignUp 注册
-func (s *userService) SignUp(phone, inviteCode, password, rePassword string) (*model.User, error) {
+func (s *userService) SignUp(phone, inviteCode, password, payPassword string) (*model.User, error) {
 	//
 
 	// 验证密码
-	err := common.IsValidatePassword(password, rePassword)
+	err := common.IsValidatePassword(password, password)
+	if err != nil {
+		return nil, err
+	}
+	err = common.IsValidatePayPassword(payPassword, payPassword)
 	if err != nil {
 		return nil, err
 	}
@@ -153,14 +157,15 @@ func (s *userService) SignUp(phone, inviteCode, password, rePassword string) (*m
 		return nil, errors.New("邀请码不存在")
 	}
 	user := &model.User{
-		Mobile:     phone,
-		Invitecode: common.GetRandomString(6),  //生成一个邀请码,此处邀请码是否会产生相同的？？TODO
-		Nickname:   common.GetRandomString(10), //先随机生成一个
-		Password:   simple.EncodePassword(password),
-		Introducer: introducer.Id,
-		Status:     model.StatusOk,
-		CreateTime: simple.NowTimestamp(),
-		UpdateTime: simple.NowTimestamp(),
+		Mobile:      phone,
+		Invitecode:  common.GetRandomString(6),  //生成一个邀请码,此处邀请码是否会产生相同的？？TODO
+		Nickname:    common.GetRandomString(10), //先随机生成一个
+		Password:    simple.EncodePassword(password),
+		Paypassword: simple.EncodePassword(payPassword),
+		Introducer:  introducer.Id,
+		Status:      model.StatusOk,
+		CreateTime:  simple.NowTimestamp(),
+		UpdateTime:  simple.NowTimestamp(),
 	}
 	if err := repositories.UserRepository.Create(simple.DB(), user); err != nil {
 		return nil, err

@@ -48,7 +48,7 @@ func (c *LoginController) PostSignup() *simple.JsonResult {
 		inviteCode  = c.Ctx.PostValueTrim("inviteCode")
 		messageCode = c.Ctx.PostValueTrim("messageCode")
 		password    = c.Ctx.PostValueTrim("password")
-		//rePassword  = c.Ctx.PostValueTrim("rePassword")
+		payPassword = c.Ctx.PostValueTrim("payPassword")
 	)
 	if !common.IsValidateMobile(mobile) {
 		return simple.JsonError(common.MobileError)
@@ -60,7 +60,7 @@ func (c *LoginController) PostSignup() *simple.JsonResult {
 	//if !captcha.VerifyString(captchaId, captchaCode) {
 	//	return simple.JsonError(common.CaptchaError)
 	//}
-	user, err := services.UserService.SignUp(mobile, inviteCode, password, password)
+	user, err := services.UserService.SignUp(mobile, inviteCode, password, payPassword)
 	if err != nil {
 		return simple.JsonErrorMsg(err.Error())
 	}
@@ -189,4 +189,14 @@ func (c *LoginController) GetSendsms() *simple.JsonResult {
 	return simple.NewEmptyRspBuilder().
 		Put("testverifycode", verifycode).
 		Put("phone", phone).JsonResult()
+}
+
+func (c *LoginController) GetVerifysms() *simple.JsonResult {
+	phone := c.Ctx.FormValue("phone")
+	code := c.Ctx.FormValue("code")
+	verifycode, exist := phonecache.GetIfPresent(phone)
+	if !exist || code != verifycode {
+		return simple.JsonErrorMsg("验证码错误")
+	}
+	return simple.JsonSuccess()
 }
