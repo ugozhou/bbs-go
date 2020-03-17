@@ -7,7 +7,7 @@ import (
 
 var Models = []interface{}{
 	&User{}, &UserToken{}, &Tag{}, &Article{}, &ArticleTag{}, &SysConfig{}, &Project{},
-	&ThirdAccount{}, &UserScore{}, &UserScoreLog{}, &UserAssert{}, &UserAssertLog{}, &Waiter{}, &Notice{},
+	&ThirdAccount{}, &UserScore{}, &UserScoreLog{}, &UserAssert{}, &UserAssertLog{}, &Waiter{}, &Notice{}, &Banner{},
 }
 
 type Model struct {
@@ -306,4 +306,11 @@ type Notice struct {
 	Title      string `gorm:"not null;" json:"title" form:"title"`           //公告标题
 	Content    string `gorm:"not null;" json:"content" form:"content"`       //内容详情
 	CreateTime int64  `gorm:"not null;" json:"createTime" form:"createTime"` //创建时间
+}
+
+type Banner struct {
+	ModelInt
+	Name      string `gorm:"unique;not null;" json:"name" form:"name"`    //名称
+	ImageUrl  string `gorm:"not null;" json:"imageurl" form:"imageurl"`   //banner 图片地址
+	TargetUrl string `gorm:"not null;" json:"targeturl" form:"targeturl"` //链接地址
 }

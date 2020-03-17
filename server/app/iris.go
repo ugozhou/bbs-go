@@ -82,6 +82,7 @@ func InitIris() {
 		m.Party("/waiter").Handle(new(api.WaiterController))
 		m.Party("/article").Handle(new(api.ArticleController))
 		m.Party("/project").Handle(new(api.ProjectController))
+		m.Party("/banner").Handle(new(api.BannerController))
 	})
 
 	// admin
